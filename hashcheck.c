@@ -77,7 +77,7 @@ void generate_pair(size_t iter) {
   unsigned char buf[BUFLEN];
   fprintf(stderr, "Generating pair with %lu iterations\n", iter);
 
-  read_random(buf, BUFLEN);
+  randombytes(buf, BUFLEN);
 
   printf("Private:\n\t");
   print_bytes(buf, BUFLEN);

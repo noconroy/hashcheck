@@ -29,7 +29,7 @@
 
 #include "util.h"
 
-void read_random(unsigned char *buf, size_t bytes) {
+void randombytes(unsigned char *buf, size_t bytes) {
   int r = open("/dev/urandom", O_RDONLY);
   size_t len = 0;
   while (len < bytes) {

@@ -25,7 +25,7 @@
 
 #define INPUT_BUFLEN 1024
 
-void read_random(unsigned char *buf, size_t bytes);
+void randombytes(unsigned char *buf, size_t bytes);
 void print_bytes(unsigned char *b, size_t len);
 void load_bytes(char *string_in, unsigned char *buf, size_t n, char *message);
 
