@@ -54,10 +54,11 @@ static void help() {
   fprintf(stderr, "  -p prove you own a certain hash\n");
 
   fprintf(stderr, "Other options:\n");
-  fprintf(stderr, "  -a to print version info and exit\n");
-  fprintf(stderr, "  -b to print this help and exit\n");
-  fprintf(stderr, "  -i to keep running in foreground\n");
-  fprintf(stderr, "  -o name to drop privileges and run as user 'name'\n");
+  fprintf(stderr, "  -a hexadecimal representation of public key\n");
+  fprintf(stderr, "  -b hexadecimal representation of private key\n");
+  fprintf(stderr, "  -i global number of iterations (default: %d)\n",
+          DEFAULT_ITERATIONS);
+  fprintf(stderr, "  -o offset for verification (default: 1)\n");
 
   exit(EXIT_SUCCESS);
 }
@@ -88,9 +89,10 @@ void generate_pair(size_t iter) {
 }
 
 size_t verify_pair(unsigned char *private, unsigned char *public, size_t iter) {
-  printf("Verifying:\n\t");
+
+  printf("Verifying: (public)\n\t");
   print_bytes(public, BUFLEN);
-  printf("with:\n\t");
+  printf("With: (private)\n\t");
   print_bytes(private, BUFLEN);
 
   if (!iter)
@@ -201,7 +203,7 @@ int main(int argc, char *argv[]) {
       printf("Success, %lu iterations!\n", result);
       exit(EXIT_SUCCESS);
     } else {
-      printf("Failure!\n");
+      printf("Could not verify pair after %d iterations\n", iterations);
       exit(EXIT_FAILURE);
     }
   }
