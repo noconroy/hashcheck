@@ -98,7 +98,7 @@ void load_bytes(char *string_in, unsigned char *buf, size_t n, char *message) {
   if (!message)
     message = "Please enter %lu bytes\n";
 
-  if (!string_in) {
+  if (!string_in || *string_in == '-') {
     fprintf(stderr, message, n);
     if (read_hex_input(buf, n) != n) {
       fprintf(stderr, "Input must be %lu bytes long\n", n);

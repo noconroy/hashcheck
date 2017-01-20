@@ -28,6 +28,7 @@
 
 #define BUFLEN SHA256_DIGEST_LENGTH
 #define DEFAULT_ITERATIONS 4194304 /* 1024*1024*4 */
+#define DEFAULT_OFFSET 1
 
 #ifndef VERSION
 #define VERSION "undefined"
@@ -40,6 +41,11 @@ static void version() {
   exit(EXIT_SUCCESS);
 }
 
+/**
+ * Prints out help for program
+ *
+ * Does not return
+ */
 static void help() {
   extern char *__progname;
 
@@ -63,6 +69,14 @@ static void help() {
   exit(EXIT_SUCCESS);
 }
 
+/**
+ * Hashes *private until either `iter` iterations have completed or it has
+ * hashed to *public. If `public` is NULL, it will be ignored.
+ *
+ * Returns 0 on failure or number of iterations on success
+ *
+ */
+
 size_t hash_until(unsigned char *private, unsigned char *public, size_t iter) {
   size_t i = 0;
   while (i++ < iter) {
@@ -73,12 +87,22 @@ size_t hash_until(unsigned char *private, unsigned char *public, size_t iter) {
   return 0;
 }
 
-void generate_pair(size_t iter) {
+/**
+ * Generates a pair of keys that where hashing Private `iter` times will  result
+ * in public.
+ *
+ * No return value
+ */
+void generate_pair(size_t iter, unsigned char *private_key_b) {
   unsigned char buf[BUFLEN];
   fprintf(stderr, "Generating pair with %lu iterations\n", iter);
 
-  randombytes(buf, BUFLEN);
-
+  /* generate pair from specific private key */
+  if (private_key_b) {
+    memcpy(buf, private_key_b, BUFLEN);
+  } else { /* generate pair from randomness */
+    randombytes(buf, BUFLEN);
+  }
   printf("Private:\n\t");
   print_bytes(buf, BUFLEN);
 
@@ -88,6 +112,12 @@ void generate_pair(size_t iter) {
   print_bytes(buf, BUFLEN);
 }
 
+/**
+ * Verifies a pair of keys is valid
+ *
+ * Returns 0 on failure, number of iterations on success
+ */
+
 size_t verify_pair(unsigned char *private, unsigned char *public, size_t iter) {
 
   printf("Verifying: (public)\n\t");
@@ -95,11 +125,19 @@ size_t verify_pair(unsigned char *private, unsigned char *public, size_t iter) {
   printf("With: (private)\n\t");
   print_bytes(private, BUFLEN);
 
+  /* set default value to iter */
   if (!iter)
     iter = 1;
 
   return hash_until(private, public, iter);
 }
+
+/**
+ * Main function parses args passed to it. Then parses hex strings and runs each
+ * mode.
+ *
+ * Return status code
+ */
 
 int main(int argc, char *argv[]) {
   char choice;
@@ -112,7 +150,7 @@ int main(int argc, char *argv[]) {
   int mode_verify = 0;
   int mode_prove = 0;
   int iterations = DEFAULT_ITERATIONS;
-  int offset = 1;
+  int offset = DEFAULT_OFFSET;
 
   while ((choice = getopt(argc, argv, "Vhcvpi:a:b:o:")) != -1) {
     switch (choice) {
@@ -152,7 +190,15 @@ int main(int argc, char *argv[]) {
   }
 
   if (mode_create) {
-    generate_pair(iterations);
+    if (private_key) {
+      load_bytes(private_key, private_key_b, BUFLEN,
+                 "Please enter your private key: ");
+      generate_pair(iterations, private_key_b);
+    } else {
+      generate_pair(iterations, NULL);
+    }
+
+    exit(EXIT_SUCCESS);
   }
 
   if (mode_prove) {
@@ -207,6 +253,8 @@ int main(int argc, char *argv[]) {
       exit(EXIT_FAILURE);
     }
   }
+
+  help();
 
   return 0;
 }
