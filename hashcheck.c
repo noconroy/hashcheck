@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) {
     memcpy(private_tmp, private_key_b, BUFLEN);
     hash_until(private_tmp, NULL, verification_iterations);
 
-    if (verify_pair(private_tmp, public_key_b, 1)) {
+    if (verify_pair(private_tmp, public_key_b, offset)) {
       printf("Success!\n");
       exit(EXIT_SUCCESS);
     } else {
