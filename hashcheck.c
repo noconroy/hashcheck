@@ -218,8 +218,9 @@ int main(int argc, char *argv[]) {
 
     if (verification_iterations <= 0 ||
         verification_iterations >= current_iterations) {
-      fprintf(stderr, "Invalid offset: %d. Can't verify\n",
-              verification_iterations);
+      fprintf(stderr, "Invalid offset: %d. Public/private key are only %lu "
+                      "iterations apart.\n",
+              offset, current_iterations);
       exit(EXIT_FAILURE);
     }
 
